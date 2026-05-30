@@ -35,7 +35,7 @@ export default function BookingConfirmationPage({ params }: PageProps) {
     `Jam: ${booking.bookingTime}`,
     `Orang: ${booking.numberOfPeople}`,
     `Durasi: ${booking.durationMinutes} menit`,
-    `Background: ${BACKGROUND_LABEL[booking.backgroundType]}`,
+    `Background: ${booking.backgroundTypes.map((b) => BACKGROUND_LABEL[b]).join(', ')}`,
     `Total: ${formatRupiah(booking.totalPrice)}`,
   ].join('\n')
 
@@ -94,7 +94,9 @@ export default function BookingConfirmationPage({ params }: PageProps) {
               <DetailRow
                 icon={<ImageIcon className="h-4 w-4 text-gold" />}
                 label="Background"
-                value={BACKGROUND_LABEL[booking.backgroundType]}
+                value={booking.backgroundTypes
+                  .map((b) => BACKGROUND_LABEL[b])
+                  .join(', ')}
               />
               <DetailRow
                 icon={<ImageIcon className="h-4 w-4 text-gold" />}

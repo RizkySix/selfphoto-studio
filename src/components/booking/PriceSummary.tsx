@@ -11,7 +11,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { formatRupiah } from '@/lib/pricing'
+import {
+  EXTRA_BACKGROUND_PRICE,
+  EXTRA_PERSON_PRICE,
+  MIN_PEOPLE,
+  formatRupiah,
+} from '@/lib/pricing'
 import { BACKGROUND_LABEL } from '@/lib/dummy-data'
 import type { BookingState, PriceBreakdown } from '@/lib/types'
 
@@ -24,29 +29,22 @@ function Row({
   label,
   detail,
   value,
-  configured,
 }: {
   label: string
   detail?: string
-  value: number
-  configured: boolean
+  value: string
 }) {
   return (
     <div className="flex items-start justify-between gap-3 py-1.5 text-sm">
       <div className="min-w-0">
         <p className="font-medium text-studio-dark">{label}</p>
-        {detail && (
-          <p className="text-xs text-studio-muted">{detail}</p>
-        )}
+        {detail && <p className="text-xs text-studio-muted">{detail}</p>}
       </div>
       <span
         key={value}
-        className={cn(
-          'shrink-0 animate-price-pop font-mono text-sm',
-          configured ? 'text-studio-dark' : 'text-studio-muted'
-        )}
+        className="shrink-0 animate-price-pop font-mono text-sm text-studio-dark"
       >
-        {configured ? formatRupiah(value) : '-'}
+        {value}
       </span>
     </div>
   )
@@ -59,52 +57,61 @@ function Breakdown({
   state: BookingState
   breakdown: PriceBreakdown
 }) {
-  const peopleConfigured = state.numberOfPeople !== null
-  const durationConfigured = state.durationMinutes !== null
-  const backgroundConfigured = state.backgroundType !== null
-  const softcopyConfigured = state.softcopyOption !== null
+  const extraPeople = Math.max(0, state.numberOfPeople - MIN_PEOPLE)
+  const durationStep = Math.max(
+    0,
+    Math.floor((state.durationMinutes - 10) / 5)
+  )
+  const extraBackgrounds = Math.max(0, state.backgroundTypes.length - 1)
 
-  const durationStep = state.durationMinutes
-    ? Math.max(0, Math.floor((state.durationMinutes - 10) / 5))
-    : 0
+  const backgroundNames = state.backgroundTypes
+    .map((b) => BACKGROUND_LABEL[b])
+    .join(', ')
 
   return (
     <div className="space-y-1">
       <Row
-        label="Jumlah orang"
+        label="Paket dasar"
+        detail={`${MIN_PEOPLE} orang · 10 menit · 1 background`}
+        value={formatRupiah(breakdown.basePackage)}
+      />
+      <Row
+        label="Tambahan orang"
         detail={
-          peopleConfigured
-            ? `${state.numberOfPeople} × ${formatRupiah(30_000)}`
-            : 'Belum dipilih'
+          extraPeople > 0
+            ? `${extraPeople} × ${formatRupiah(EXTRA_PERSON_PRICE)}`
+            : `${state.numberOfPeople} orang (sudah termasuk paket)`
         }
-        value={breakdown.basePeople}
-        configured={peopleConfigured}
+        value={formatRupiah(breakdown.peopleSurcharge)}
       />
       <Row
         label="Durasi"
         detail={
-          durationConfigured
-            ? `${state.durationMinutes} mnt${durationStep > 0 ? ` (${durationStep} × ${formatRupiah(25_000)})` : ''}`
-            : 'Belum dipilih'
+          durationStep > 0
+            ? `${state.durationMinutes} mnt (${durationStep} × ${formatRupiah(25_000)})`
+            : `${state.durationMinutes} mnt (sudah termasuk paket)`
         }
-        value={breakdown.durationSurcharge}
-        configured={durationConfigured}
+        value={formatRupiah(breakdown.durationSurcharge)}
       />
       <Row
         label="Background"
         detail={
-          backgroundConfigured
-            ? BACKGROUND_LABEL[state.backgroundType!]
+          backgroundNames
+            ? `${state.backgroundTypes.length} pilihan: ${backgroundNames}`
             : 'Belum dipilih'
         }
-        value={breakdown.backgroundSurcharge}
-        configured={backgroundConfigured}
+        value={
+          extraBackgrounds > 0
+            ? `+${formatRupiah(extraBackgrounds * EXTRA_BACKGROUND_PRICE)}`
+            : formatRupiah(0)
+        }
       />
       <Row
         label="Softcopy"
-        detail={softcopyConfigured ? 'Sesuai pilihan' : 'Belum dipilih'}
-        value={breakdown.softcopySurcharge}
-        configured={softcopyConfigured}
+        detail={
+          state.softcopyOption ? 'Sesuai pilihan' : 'Belum dipilih'
+        }
+        value={formatRupiah(breakdown.softcopySurcharge)}
       />
 
       <Separator className="my-3" />
@@ -117,7 +124,7 @@ function Breakdown({
           key={breakdown.total}
           className="animate-price-pop font-display text-2xl font-semibold text-gold"
         >
-          {peopleConfigured ? formatRupiah(breakdown.total) : '-'}
+          {formatRupiah(breakdown.total)}
         </span>
       </div>
     </div>
@@ -147,7 +154,10 @@ export function PriceSummary({ state, breakdown }: PriceSummaryProps) {
         <SheetTrigger asChild>
           <button
             type="button"
-            className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t bg-white px-5 py-3 shadow-[0_-4px_18px_rgba(0,0,0,0.08)] lg:hidden"
+            className={cn(
+              'fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t bg-white px-5 py-3 shadow-[0_-4px_18px_rgba(0,0,0,0.08)]',
+              'lg:hidden'
+            )}
             aria-label="Lihat ringkasan harga"
           >
             <div className="flex flex-col text-left">
@@ -158,9 +168,7 @@ export function PriceSummary({ state, breakdown }: PriceSummaryProps) {
                 key={breakdown.total}
                 className="animate-price-pop font-display text-xl font-semibold text-gold"
               >
-                {state.numberOfPeople !== null
-                  ? formatRupiah(breakdown.total)
-                  : '-'}
+                {formatRupiah(breakdown.total)}
               </span>
             </div>
             <div className="flex items-center gap-1 text-xs font-medium text-studio-dark">

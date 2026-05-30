@@ -17,9 +17,9 @@ export type BookingStep = 1 | 2 | 3 | 4
 
 export interface BookingState {
   step: BookingStep
-  numberOfPeople: number | null
-  durationMinutes: number | null
-  backgroundType: BackgroundType | null
+  numberOfPeople: number
+  durationMinutes: number
+  backgroundTypes: BackgroundType[]
   softcopyOption: SoftcopyOption | null
   customerName: string
   customerPhone: string
@@ -29,7 +29,8 @@ export interface BookingState {
 }
 
 export interface PriceBreakdown {
-  basePeople: number
+  basePackage: number
+  peopleSurcharge: number
   durationSurcharge: number
   backgroundSurcharge: number
   softcopySurcharge: number
@@ -48,5 +49,4 @@ export interface BackgroundOption {
   label: string
   description: string
   colorPreview: string
-  surcharge: number
 }

@@ -3,7 +3,11 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { calculatePriceBreakdown } from '@/lib/pricing'
+import {
+  DEFAULT_DURATION,
+  MIN_PEOPLE,
+  calculatePriceBreakdown,
+} from '@/lib/pricing'
 import {
   BackgroundType,
   BookingState,
@@ -14,9 +18,9 @@ import {
 
 const INITIAL_STATE: BookingState = {
   step: 1,
-  numberOfPeople: null,
-  durationMinutes: null,
-  backgroundType: null,
+  numberOfPeople: MIN_PEOPLE,
+  durationMinutes: DEFAULT_DURATION,
+  backgroundTypes: [BackgroundType.WALL_BOOK],
   softcopyOption: null,
   customerName: '',
   customerPhone: '',
@@ -31,6 +35,7 @@ export interface UseBookingReturn {
   canProceedToNextStep: boolean
   isSubmitting: boolean
   updateBooking: (partial: Partial<BookingState>) => void
+  toggleBackground: (type: BackgroundType) => void
   goToNextStep: () => void
   goToPreviousStep: () => void
   goToStep: (step: BookingStep) => void
@@ -44,26 +49,26 @@ export function useBooking(): UseBookingReturn {
 
   const priceBreakdown = useMemo<PriceBreakdown>(() => {
     return calculatePriceBreakdown(
-      state.numberOfPeople ?? 0,
-      state.durationMinutes ?? 10,
-      state.backgroundType ?? BackgroundType.WALL_BOOK,
-      state.softcopyOption ?? SoftcopyOption.FREE_FOLLOW_IG
+      state.numberOfPeople,
+      state.durationMinutes,
+      state.backgroundTypes,
+      state.softcopyOption
     )
   }, [
     state.numberOfPeople,
     state.durationMinutes,
-    state.backgroundType,
+    state.backgroundTypes,
     state.softcopyOption,
   ])
 
   const canProceedToNextStep = useMemo<boolean>(() => {
     switch (state.step) {
       case 1:
-        return state.numberOfPeople !== null
+        return state.numberOfPeople >= MIN_PEOPLE
       case 2:
-        return state.durationMinutes !== null
+        return state.durationMinutes >= DEFAULT_DURATION
       case 3:
-        return state.backgroundType !== null
+        return state.backgroundTypes.length >= 1
       case 4:
         return (
           state.customerName.trim().length > 0 &&
@@ -82,6 +87,24 @@ export function useBooking(): UseBookingReturn {
       ...prev,
       ...partial,
     }))
+  }, [])
+
+  const toggleBackground = useCallback((type: BackgroundType) => {
+    setState((prev) => {
+      const exists = prev.backgroundTypes.includes(type)
+      if (exists) {
+        if (prev.backgroundTypes.length === 1) return prev
+        return {
+          ...prev,
+          backgroundTypes: prev.backgroundTypes.filter((b) => b !== type),
+        }
+      }
+      if (prev.backgroundTypes.length >= 3) return prev
+      return {
+        ...prev,
+        backgroundTypes: [...prev.backgroundTypes, type],
+      }
+    })
   }, [])
 
   const goToNextStep = useCallback(() => {
@@ -115,6 +138,7 @@ export function useBooking(): UseBookingReturn {
     canProceedToNextStep,
     isSubmitting,
     updateBooking,
+    toggleBackground,
     goToNextStep,
     goToPreviousStep,
     goToStep,

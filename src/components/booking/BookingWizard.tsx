@@ -20,6 +20,7 @@ export function BookingWizard({ booking }: BookingWizardProps) {
     canProceedToNextStep,
     isSubmitting,
     updateBooking,
+    toggleBackground,
     goToNextStep,
     goToPreviousStep,
     goToStep,
@@ -45,8 +46,8 @@ export function BookingWizard({ booking }: BookingWizardProps) {
         )}
         {state.step === 3 && (
           <StepBackground
-            backgroundType={state.backgroundType}
-            onChange={(v) => updateBooking({ backgroundType: v })}
+            backgroundTypes={state.backgroundTypes}
+            onToggle={toggleBackground}
           />
         )}
         {state.step === 4 && (

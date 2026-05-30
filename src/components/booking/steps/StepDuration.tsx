@@ -7,7 +7,7 @@ import { DURATION_OPTIONS } from '@/lib/dummy-data'
 import { durationSurchargeFor, formatRupiah } from '@/lib/pricing'
 
 interface StepDurationProps {
-  durationMinutes: number | null
+  durationMinutes: number
   onChange: (value: number) => void
 }
 
@@ -23,11 +23,12 @@ export function StepDuration({ durationMinutes, onChange }: StepDurationProps) {
           Pilih durasi sesi foto
         </h2>
         <p className="text-sm text-studio-muted">
-          Mulai dari 10 menit, bisa diperpanjang sampai 60 menit.
+          Mulai dari 10 menit (gratis), maksimal 30 menit. Setiap +5 menit
+          hanya {formatRupiah(25_000)}.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
         {DURATION_OPTIONS.map((minutes) => {
           const surcharge = durationSurchargeFor(minutes)
           const isSelected = durationMinutes === minutes
@@ -44,12 +45,7 @@ export function StepDuration({ durationMinutes, onChange }: StepDurationProps) {
               )}
               aria-pressed={isSelected}
             >
-              <span
-                className={cn(
-                  'font-display text-2xl font-semibold transition-colors',
-                  isSelected ? 'text-studio-dark' : 'text-studio-dark/90'
-                )}
-              >
+              <span className="font-display text-2xl font-semibold text-studio-dark">
                 {minutes}
               </span>
               <span className="text-xs uppercase tracking-wide text-studio-muted">

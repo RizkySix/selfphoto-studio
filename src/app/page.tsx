@@ -67,7 +67,7 @@ export default function HomePage() {
               <div className="absolute -bottom-5 -left-5 hidden rounded-2xl border bg-white p-4 shadow-lg md:block">
                 <p className="text-xs text-studio-muted">Mulai dari</p>
                 <p className="font-display text-2xl font-semibold text-gold">
-                  Rp 60.000
+                  Rp 50.000
                 </p>
               </div>
             </div>
@@ -78,18 +78,18 @@ export default function HomePage() {
           <div className="grid gap-4 md:grid-cols-3">
             <HighlightCard
               icon={<Wallet className="h-5 w-5" />}
-              title="Mulai dari Rp 60.000"
-              description="Harga ramah, tanpa biaya tersembunyi."
+              title="Mulai dari Rp 50.000"
+              description="Paket all-in untuk 2 orang, 10 menit."
             />
             <HighlightCard
               icon={<Clock className="h-5 w-5" />}
-              title="Self Photo 10–60 Menit"
+              title="Self Photo 10–30 Menit"
               description="Pilih durasi sesuai kebutuhan kamu."
             />
             <HighlightCard
               icon={<Palette className="h-5 w-5" />}
-              title="6 Pilihan Background"
-              description="Dari Wall Book sampai Taman Garden."
+              title="6 Background, Pilih s/d 3"
+              description="Kombinasikan latar sesuai mood foto kamu."
             />
           </div>
         </section>

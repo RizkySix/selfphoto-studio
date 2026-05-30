@@ -3,34 +3,24 @@
 import { Minus, Plus, Users } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { formatRupiah } from '@/lib/pricing'
+import {
+  BASE_PACKAGE_PRICE,
+  EXTRA_PERSON_PRICE,
+  MAX_PEOPLE,
+  MIN_PEOPLE,
+  formatRupiah,
+  peopleSurchargeFor,
+} from '@/lib/pricing'
 
 interface StepPeopleProps {
-  numberOfPeople: number | null
+  numberOfPeople: number
   onChange: (value: number) => void
 }
 
-const MIN_PEOPLE = 2
-const MAX_PEOPLE = 10
-const PRICE_PER_PERSON = 30_000
-
 export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
-  const current = numberOfPeople ?? MIN_PEOPLE
-  const subtotal = current * PRICE_PER_PERSON
-  const isAtMin = current <= MIN_PEOPLE
-  const isAtMax = current >= MAX_PEOPLE
-
-  const handleDecrement = () => {
-    if (!isAtMin) onChange(current - 1)
-  }
-
-  const handleIncrement = () => {
-    if (numberOfPeople === null) {
-      onChange(MIN_PEOPLE)
-      return
-    }
-    if (!isAtMax) onChange(current + 1)
-  }
+  const subtotal = BASE_PACKAGE_PRICE + peopleSurchargeFor(numberOfPeople)
+  const isAtMin = numberOfPeople <= MIN_PEOPLE
+  const isAtMax = numberOfPeople >= MAX_PEOPLE
 
   return (
     <div className="animate-slide-in-right space-y-8">
@@ -43,7 +33,8 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
           Berapa orang yang akan foto?
         </h2>
         <p className="text-sm text-studio-muted">
-          Pilih jumlah orang dari 2 sampai 10 orang.
+          Minimal 2 orang sudah termasuk paket {formatRupiah(BASE_PACKAGE_PRICE)}.
+          Setiap orang tambahan +{formatRupiah(EXTRA_PERSON_PRICE)}.
         </p>
       </div>
 
@@ -54,8 +45,8 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
             variant="outline"
             size="icon"
             className="h-14 w-14 rounded-full border-2 border-studio-dark/15 hover:border-gold hover:bg-gold/10"
-            onClick={handleDecrement}
-            disabled={numberOfPeople === null || isAtMin}
+            onClick={() => onChange(numberOfPeople - 1)}
+            disabled={isAtMin}
             aria-label="Kurangi jumlah orang"
           >
             <Minus className="h-6 w-6" />
@@ -63,10 +54,10 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
 
           <div className="flex min-w-[7rem] flex-col items-center">
             <span
-              key={current}
+              key={numberOfPeople}
               className="animate-price-pop font-display text-7xl font-semibold text-studio-dark md:text-8xl"
             >
-              {numberOfPeople ?? '-'}
+              {numberOfPeople}
             </span>
             <span className="mt-1 text-sm text-studio-muted">orang</span>
           </div>
@@ -76,7 +67,7 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
             variant="outline"
             size="icon"
             className="h-14 w-14 rounded-full border-2 border-studio-dark/15 hover:border-gold hover:bg-gold/10"
-            onClick={handleIncrement}
+            onClick={() => onChange(numberOfPeople + 1)}
             disabled={isAtMax}
             aria-label="Tambah jumlah orang"
           >
@@ -86,18 +77,22 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
 
         <div className="text-center">
           <p className="text-sm text-studio-muted">
-            {numberOfPeople ?? '-'} × {formatRupiah(PRICE_PER_PERSON)}/orang
+            Paket {formatRupiah(BASE_PACKAGE_PRICE)}
+            {numberOfPeople > MIN_PEOPLE && (
+              <>
+                {' + '}
+                {numberOfPeople - MIN_PEOPLE} × {formatRupiah(EXTRA_PERSON_PRICE)}
+              </>
+            )}
           </p>
           <p className="mt-1 font-display text-2xl font-semibold text-gold">
-            = {numberOfPeople === null ? '-' : formatRupiah(subtotal)}
+            = {formatRupiah(subtotal)}
           </p>
         </div>
       </div>
 
       <p className="text-center text-xs text-studio-muted">
-        Tap tombol{' '}
-        <span className="font-semibold text-studio-dark">+</span> untuk
-        memulai
+        Minimal {MIN_PEOPLE} orang, maksimal {MAX_PEOPLE} orang.
       </p>
     </div>
   )
