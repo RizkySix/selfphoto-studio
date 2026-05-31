@@ -43,12 +43,12 @@ export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) 
                   className={cn(
                     'flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300',
                     isCompleted &&
-                      'border-gold bg-gold text-studio-dark hover:scale-105',
+                      'border-studio-black bg-studio-black text-white hover:scale-105',
                     isActive &&
-                      'border-gold bg-cream text-gold ring-4 ring-gold/20',
+                      'border-studio-black bg-studio-black text-white ring-2 ring-studio-black ring-offset-2',
                     !isCompleted &&
                       !isActive &&
-                      'border-studio-muted/30 bg-white text-studio-muted'
+                      'border-studio-subtle bg-studio-subtle text-studio-muted'
                   )}
                   aria-label={`Langkah ${step.id}: ${step.label}`}
                 >
@@ -62,7 +62,7 @@ export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) 
                   className={cn(
                     'mt-2 hidden text-xs font-medium md:block',
                     (isActive || isCompleted)
-                      ? 'text-studio-dark'
+                      ? 'text-studio-black'
                       : 'text-studio-muted'
                   )}
                 >
@@ -73,7 +73,7 @@ export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) 
                 <div
                   className={cn(
                     'mx-2 h-0.5 flex-1 transition-colors duration-300 md:mx-4',
-                    step.id < currentStep ? 'bg-gold' : 'bg-studio-muted/20'
+                    step.id < currentStep ? 'bg-studio-black' : 'bg-studio-muted/20'
                   )}
                 />
               )}

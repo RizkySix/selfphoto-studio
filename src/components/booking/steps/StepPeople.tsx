@@ -25,11 +25,11 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
   return (
     <div className="animate-slide-in-right space-y-8">
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold">
+        <div className="inline-flex items-center gap-2 rounded-full bg-studio-offwhite px-3 py-1 text-xs font-medium text-studio-black">
           <Users className="h-3.5 w-3.5" />
           Langkah 1
         </div>
-        <h2 className="font-display text-3xl text-studio-dark md:text-4xl">
+        <h2 className="font-display text-3xl text-studio-black md:text-4xl">
           Berapa orang yang akan foto?
         </h2>
         <p className="text-sm text-studio-muted">
@@ -44,7 +44,7 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
             type="button"
             variant="outline"
             size="icon"
-            className="h-14 w-14 rounded-full border-2 border-studio-dark/15 hover:border-gold hover:bg-gold/10"
+            className="h-14 w-14 rounded-full border-2 border-studio-black/15 hover:border-studio-black hover:bg-studio-offwhite"
             onClick={() => onChange(numberOfPeople - 1)}
             disabled={isAtMin}
             aria-label="Kurangi jumlah orang"
@@ -55,7 +55,7 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
           <div className="flex min-w-[7rem] flex-col items-center">
             <span
               key={numberOfPeople}
-              className="animate-price-pop font-display text-7xl font-semibold text-studio-dark md:text-8xl"
+              className="animate-price-pop font-display text-7xl font-semibold text-studio-black md:text-8xl"
             >
               {numberOfPeople}
             </span>
@@ -66,7 +66,7 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
             type="button"
             variant="outline"
             size="icon"
-            className="h-14 w-14 rounded-full border-2 border-studio-dark/15 hover:border-gold hover:bg-gold/10"
+            className="h-14 w-14 rounded-full border-2 border-studio-black/15 hover:border-studio-black hover:bg-studio-offwhite"
             onClick={() => onChange(numberOfPeople + 1)}
             disabled={isAtMax}
             aria-label="Tambah jumlah orang"
@@ -85,7 +85,7 @@ export function StepPeople({ numberOfPeople, onChange }: StepPeopleProps) {
               </>
             )}
           </p>
-          <p className="mt-1 font-display text-2xl font-semibold text-gold">
+          <p className="mt-1 font-display text-2xl font-semibold text-studio-black">
             = {formatRupiah(subtotal)}
           </p>
         </div>

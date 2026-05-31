@@ -15,16 +15,45 @@ export enum SoftcopyOption {
 
 export type BookingStep = 1 | 2 | 3 | 4
 
+export const DURATION_OPTIONS = [10, 15, 20, 25, 30] as const
+export type DurationMinutes = (typeof DURATION_OPTIONS)[number]
+
+export function getTotalBlockedMinutes(duration: DurationMinutes): number {
+  return duration * 2
+}
+
+export function getRequiredSlotCount(duration: DurationMinutes): number {
+  return (duration * 2) / 10
+}
+
+export type SlotStatus = 'AVAILABLE' | 'RESERVED' | 'BOOKED' | 'BLOCKED'
+
+export interface TimeSlot {
+  id: string
+  timeStart: string
+  timeEnd: string
+  status: SlotStatus
+}
+
+export interface AvailableStartTime {
+  startSlotId: string
+  timeStart: string
+  timeEnd: string
+  isAvailable: boolean
+}
+
 export interface BookingState {
   step: BookingStep
   numberOfPeople: number
-  durationMinutes: number
+  durationMinutes: DurationMinutes
   backgroundTypes: BackgroundType[]
   softcopyOption: SoftcopyOption | null
   customerName: string
   customerPhone: string
-  bookingDate: Date | null
-  bookingTime: string | null
+  bookingDate: string | null
+  startSlotId: string | null
+  selectedTimeStart: string | null
+  selectedTimeEnd: string | null
   totalPrice: number
 }
 
@@ -35,13 +64,6 @@ export interface PriceBreakdown {
   backgroundSurcharge: number
   softcopySurcharge: number
   total: number
-}
-
-export interface AvailableSlot {
-  id: string
-  timeStart: string
-  timeEnd: string
-  isBooked: boolean
 }
 
 export interface BackgroundOption {

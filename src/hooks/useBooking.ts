@@ -9,9 +9,11 @@ import {
   calculatePriceBreakdown,
 } from '@/lib/pricing'
 import {
+  AvailableStartTime,
   BackgroundType,
   BookingState,
   BookingStep,
+  DurationMinutes,
   PriceBreakdown,
   SoftcopyOption,
 } from '@/lib/types'
@@ -19,13 +21,15 @@ import {
 const INITIAL_STATE: BookingState = {
   step: 1,
   numberOfPeople: MIN_PEOPLE,
-  durationMinutes: DEFAULT_DURATION,
-  backgroundTypes: [BackgroundType.WALL_BOOK],
+  durationMinutes: DEFAULT_DURATION as DurationMinutes,
+  backgroundTypes: [],
   softcopyOption: null,
   customerName: '',
   customerPhone: '',
   bookingDate: null,
-  bookingTime: null,
+  startSlotId: null,
+  selectedTimeStart: null,
+  selectedTimeEnd: null,
   totalPrice: 0,
 }
 
@@ -36,6 +40,9 @@ export interface UseBookingReturn {
   isSubmitting: boolean
   updateBooking: (partial: Partial<BookingState>) => void
   toggleBackground: (type: BackgroundType) => void
+  updateDuration: (duration: DurationMinutes) => void
+  updateBookingDate: (date: string | null) => void
+  selectTimeSlot: (slot: AvailableStartTime) => void
   goToNextStep: () => void
   goToPreviousStep: () => void
   goToStep: (step: BookingStep) => void
@@ -74,7 +81,7 @@ export function useBooking(): UseBookingReturn {
           state.customerName.trim().length > 0 &&
           state.customerPhone.trim().length >= 8 &&
           state.bookingDate !== null &&
-          state.bookingTime !== null &&
+          state.startSlotId !== null &&
           state.softcopyOption !== null
         )
       default:
@@ -83,17 +90,13 @@ export function useBooking(): UseBookingReturn {
   }, [state])
 
   const updateBooking = useCallback((partial: Partial<BookingState>) => {
-    setState((prev) => ({
-      ...prev,
-      ...partial,
-    }))
+    setState((prev) => ({ ...prev, ...partial }))
   }, [])
 
   const toggleBackground = useCallback((type: BackgroundType) => {
     setState((prev) => {
       const exists = prev.backgroundTypes.includes(type)
       if (exists) {
-        if (prev.backgroundTypes.length === 1) return prev
         return {
           ...prev,
           backgroundTypes: prev.backgroundTypes.filter((b) => b !== type),
@@ -105,6 +108,35 @@ export function useBooking(): UseBookingReturn {
         backgroundTypes: [...prev.backgroundTypes, type],
       }
     })
+  }, [])
+
+  const updateDuration = useCallback((duration: DurationMinutes) => {
+    setState((prev) => ({
+      ...prev,
+      durationMinutes: duration,
+      startSlotId: null,
+      selectedTimeStart: null,
+      selectedTimeEnd: null,
+    }))
+  }, [])
+
+  const updateBookingDate = useCallback((date: string | null) => {
+    setState((prev) => ({
+      ...prev,
+      bookingDate: date,
+      startSlotId: null,
+      selectedTimeStart: null,
+      selectedTimeEnd: null,
+    }))
+  }, [])
+
+  const selectTimeSlot = useCallback((slot: AvailableStartTime) => {
+    setState((prev) => ({
+      ...prev,
+      startSlotId: slot.startSlotId,
+      selectedTimeStart: slot.timeStart,
+      selectedTimeEnd: slot.timeEnd,
+    }))
   }, [])
 
   const goToNextStep = useCallback(() => {
@@ -129,7 +161,7 @@ export function useBooking(): UseBookingReturn {
     setIsSubmitting(true)
     await new Promise<void>((resolve) => setTimeout(resolve, 1500))
     setIsSubmitting(false)
-    router.push('/booking-confirmation/BST-2024-001')
+    router.push('/booking-confirmation/BST-2025-001')
   }, [router])
 
   return {
@@ -139,6 +171,9 @@ export function useBooking(): UseBookingReturn {
     isSubmitting,
     updateBooking,
     toggleBackground,
+    updateDuration,
+    updateBookingDate,
+    selectTimeSlot,
     goToNextStep,
     goToPreviousStep,
     goToStep,

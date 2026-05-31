@@ -20,7 +20,7 @@ export function WhatsAppShareButton({ text }: WhatsAppShareButtonProps) {
   return (
     <Button
       type="button"
-      variant="gold"
+      variant="solid"
       size="lg"
       className="w-full sm:flex-1"
       onClick={handleClick}

@@ -14,10 +14,10 @@ export default function BookPage() {
 
       <main className="container py-8 md:py-12">
         <div className="mb-8 max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-studio-black">
             Booking Sesi
           </p>
-          <h1 className="mt-2 font-display text-3xl text-studio-dark md:text-4xl">
+          <h1 className="mt-2 font-display text-3xl text-studio-black md:text-4xl">
             Atur sesi self photo kamu
           </h1>
           <p className="mt-2 text-sm text-studio-muted">
@@ -26,7 +26,7 @@ export default function BookPage() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-          <div className="rounded-3xl border bg-cream/40 p-6 shadow-sm md:p-8">
+          <div className="rounded-3xl border border-studio-border bg-white p-6 shadow-sm md:p-8">
             <BookingWizard booking={booking} />
           </div>
           <PriceSummary

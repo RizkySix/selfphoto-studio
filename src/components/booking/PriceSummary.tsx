@@ -1,6 +1,8 @@
 'use client'
 
-import { ChevronUp, Receipt } from 'lucide-react'
+import { CalendarDays, ChevronUp, Clock, Receipt } from 'lucide-react'
+import { format, parse } from 'date-fns'
+import { id as idLocale } from 'date-fns/locale'
 
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -37,15 +39,70 @@ function Row({
   return (
     <div className="flex items-start justify-between gap-3 py-1.5 text-sm">
       <div className="min-w-0">
-        <p className="font-medium text-studio-dark">{label}</p>
+        <p className="label-text text-studio-black">{label}</p>
         {detail && <p className="text-xs text-studio-muted">{detail}</p>}
       </div>
       <span
         key={value}
-        className="shrink-0 animate-price-pop font-mono text-sm text-studio-dark"
+        className="shrink-0 animate-price-pop font-mono text-sm text-studio-black"
       >
         {value}
       </span>
+    </div>
+  )
+}
+
+function formatLongDate(date: string): string {
+  return format(
+    parse(date, 'yyyy-MM-dd', new Date()),
+    'EEEE, d MMMM yyyy',
+    { locale: idLocale }
+  )
+}
+
+function formatShortDate(date: string): string {
+  return format(parse(date, 'yyyy-MM-dd', new Date()), 'EEE d MMM', {
+    locale: idLocale,
+  })
+}
+
+function Schedule({ state }: { state: BookingState }) {
+  if (!state.bookingDate && !state.selectedTimeStart) return null
+
+  return (
+    <div className="mt-4 rounded-xl border border-studio-border bg-studio-offwhite p-3 text-sm">
+      <p className="label-text text-[11px] font-semibold uppercase tracking-[0.18em] text-studio-muted">
+        Jadwal
+      </p>
+      <div className="mt-2 space-y-1.5">
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex items-center gap-2 text-studio-muted">
+            <CalendarDays className="h-3.5 w-3.5" />
+            Tanggal
+          </span>
+          <span className="text-right font-medium text-studio-black">
+            {state.bookingDate ? formatLongDate(state.bookingDate) : '—'}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex items-center gap-2 text-studio-muted">
+            <Clock className="h-3.5 w-3.5" />
+            Mulai
+          </span>
+          <span className="price-display text-studio-black">
+            {state.selectedTimeStart ?? '—'}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex items-center gap-2 text-studio-muted">
+            <Clock className="h-3.5 w-3.5" />
+            Selesai
+          </span>
+          <span className="price-display text-studio-black">
+            {state.selectedTimeEnd ?? '—'}
+          </span>
+        </div>
+      </div>
     </div>
   )
 }
@@ -58,10 +115,6 @@ function Breakdown({
   breakdown: PriceBreakdown
 }) {
   const extraPeople = Math.max(0, state.numberOfPeople - MIN_PEOPLE)
-  const durationStep = Math.max(
-    0,
-    Math.floor((state.durationMinutes - 10) / 5)
-  )
   const extraBackgrounds = Math.max(0, state.backgroundTypes.length - 1)
 
   const backgroundNames = state.backgroundTypes
@@ -76,21 +129,17 @@ function Breakdown({
         value={formatRupiah(breakdown.basePackage)}
       />
       <Row
-        label="Tambahan orang"
+        label="Jumlah orang"
         detail={
           extraPeople > 0
-            ? `${extraPeople} × ${formatRupiah(EXTRA_PERSON_PRICE)}`
+            ? `${state.numberOfPeople} orang (${extraPeople} × ${formatRupiah(EXTRA_PERSON_PRICE)})`
             : `${state.numberOfPeople} orang (sudah termasuk paket)`
         }
         value={formatRupiah(breakdown.peopleSurcharge)}
       />
       <Row
-        label="Durasi"
-        detail={
-          durationStep > 0
-            ? `${state.durationMinutes} mnt (${durationStep} × ${formatRupiah(25_000)})`
-            : `${state.durationMinutes} mnt (sudah termasuk paket)`
-        }
+        label="Durasi foto"
+        detail={`${state.durationMinutes} menit`}
         value={formatRupiah(breakdown.durationSurcharge)}
       />
       <Row
@@ -116,18 +165,44 @@ function Breakdown({
 
       <Separator className="my-3" />
 
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold uppercase tracking-wide text-studio-dark">
+      <div className="-mx-2 flex items-center justify-between rounded-xl bg-studio-black px-4 py-3 text-white">
+        <span className="label-text text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
           Total
         </span>
         <span
           key={breakdown.total}
-          className="animate-price-pop font-display text-2xl font-semibold text-gold"
+          className="price-display animate-price-pop text-2xl text-white"
         >
           {formatRupiah(breakdown.total)}
         </span>
       </div>
+
+      <Schedule state={state} />
     </div>
+  )
+}
+
+function MobileBottomLabel({
+  state,
+  total,
+}: {
+  state: BookingState
+  total: number
+}) {
+  const datePart = state.bookingDate ? formatShortDate(state.bookingDate) : null
+  const timePart =
+    state.selectedTimeStart && state.selectedTimeEnd
+      ? `${state.selectedTimeStart}–${state.selectedTimeEnd}`
+      : null
+  const parts = [formatRupiah(total), datePart, timePart].filter(Boolean)
+
+  return (
+    <span
+      key={parts.join('·')}
+      className="price-display animate-price-pop text-base text-studio-black"
+    >
+      {parts.join(' · ')}
+    </span>
   )
 }
 
@@ -135,10 +210,10 @@ export function PriceSummary({ state, breakdown }: PriceSummaryProps) {
   return (
     <>
       <aside className="hidden lg:block">
-        <div className="sticky top-24 rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="sticky top-24 rounded-2xl border border-studio-border bg-white p-6 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
-            <Receipt className="h-4 w-4 text-gold" />
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-studio-dark">
+            <Receipt className="h-4 w-4 text-studio-black" />
+            <h3 className="label-text text-xs font-semibold uppercase tracking-[0.18em] text-studio-black">
               Ringkasan Harga
             </h3>
           </div>
@@ -155,7 +230,7 @@ export function PriceSummary({ state, breakdown }: PriceSummaryProps) {
           <button
             type="button"
             className={cn(
-              'fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t bg-white px-5 py-3 shadow-[0_-4px_18px_rgba(0,0,0,0.08)]',
+              'fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-studio-border bg-white px-5 py-3 shadow-[0_-4px_18px_rgba(0,0,0,0.08)]',
               'lg:hidden'
             )}
             aria-label="Lihat ringkasan harga"
@@ -164,14 +239,9 @@ export function PriceSummary({ state, breakdown }: PriceSummaryProps) {
               <span className="text-[10px] uppercase tracking-[0.18em] text-studio-muted">
                 Total
               </span>
-              <span
-                key={breakdown.total}
-                className="animate-price-pop font-display text-xl font-semibold text-gold"
-              >
-                {formatRupiah(breakdown.total)}
-              </span>
+              <MobileBottomLabel state={state} total={breakdown.total} />
             </div>
-            <div className="flex items-center gap-1 text-xs font-medium text-studio-dark">
+            <div className="flex items-center gap-1 text-xs font-medium text-studio-black">
               Lihat rincian
               <ChevronUp className="h-4 w-4" />
             </div>

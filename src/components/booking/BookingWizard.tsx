@@ -21,6 +21,9 @@ export function BookingWizard({ booking }: BookingWizardProps) {
     isSubmitting,
     updateBooking,
     toggleBackground,
+    updateDuration,
+    updateBookingDate,
+    selectTimeSlot,
     goToNextStep,
     goToPreviousStep,
     goToStep,
@@ -41,7 +44,7 @@ export function BookingWizard({ booking }: BookingWizardProps) {
         {state.step === 2 && (
           <StepDuration
             durationMinutes={state.durationMinutes}
-            onChange={(v) => updateBooking({ durationMinutes: v })}
+            onChange={updateDuration}
           />
         )}
         {state.step === 3 && (
@@ -55,14 +58,16 @@ export function BookingWizard({ booking }: BookingWizardProps) {
             customerName={state.customerName}
             customerPhone={state.customerPhone}
             bookingDate={state.bookingDate}
-            bookingTime={state.bookingTime}
+            startSlotId={state.startSlotId}
+            selectedTimeStart={state.selectedTimeStart}
+            durationMinutes={state.durationMinutes}
             softcopyOption={state.softcopyOption}
             isSubmitting={isSubmitting}
             canSubmit={canProceedToNextStep}
             onCustomerName={(v) => updateBooking({ customerName: v })}
             onCustomerPhone={(v) => updateBooking({ customerPhone: v })}
-            onBookingDate={(d) => updateBooking({ bookingDate: d })}
-            onBookingTime={(t) => updateBooking({ bookingTime: t })}
+            onBookingDate={updateBookingDate}
+            onSelectSlot={selectTimeSlot}
             onSoftcopyOption={(o) => updateBooking({ softcopyOption: o })}
             onSubmit={submitBooking}
           />
@@ -83,7 +88,7 @@ export function BookingWizard({ booking }: BookingWizardProps) {
           </Button>
           <Button
             type="button"
-            variant="gold"
+            variant="solid"
             size="lg"
             onClick={goToNextStep}
             disabled={!canProceedToNextStep}

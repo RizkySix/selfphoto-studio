@@ -51,11 +51,15 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        gold: '#D4A853',
-        cream: '#FAF8F5',
         studio: {
-          dark: '#1a1a1a',
-          muted: '#6B6B6B',
+          black: '#0A0A0A',
+          white: '#FFFFFF',
+          offwhite: '#F5F5F5',
+          cream: '#FAFAFA',
+          muted: '#737373',
+          subtle: '#E5E5E5',
+          border: '#D4D4D4',
+          hover: '#F0F0F0',
         },
       },
       borderRadius: {
@@ -64,8 +68,8 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        display: ['var(--font-playfair)', 'serif'],
-        sans: ['var(--font-dm-sans)', 'sans-serif'],
+        display: ['var(--font-syne)', 'sans-serif'],
+        sans: ['var(--font-plus-jakarta)', 'sans-serif'],
       },
       keyframes: {
         'accordion-down': {
@@ -86,7 +90,7 @@ const config: Config = {
         },
         'price-pop': {
           '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.08)', color: '#D4A853' },
+          '50%': { transform: 'scale(1.08)' },
           '100%': { transform: 'scale(1)' },
         },
         'check-pop': {
